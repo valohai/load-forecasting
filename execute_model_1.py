@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 from pandas import datetime
 import math, time
@@ -69,7 +68,6 @@ model = model_from_json(loaded_model_json)
 model.load_weights("model.h5")
 print("Loaded model from disk")
 
-from matplotlib import pyplot
 def mean_absolute_percentage_error(y_true, y_pred):
     y_true, y_pred = np.array(y_true), np.array(y_pred)
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
