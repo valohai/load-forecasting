@@ -1,11 +1,13 @@
 import os
 import glob
+import json
 import argparse
 import numpy as np
 import pandas as pd
 from keras.layers.core import Dense, Dropout
 from keras.layers.recurrent import LSTM
 from keras.models import Sequential
+from keras.callbacks import LambdaCallback
 
 
 def get_data():
@@ -72,6 +74,16 @@ def main(settings):
     print("X_test", X_test.shape)
     print("y_test", y_test.shape)
 
+    json_logging_callback = LambdaCallback(
+        on_epoch_end=lambda epoch, logs: print(json.dumps({
+            "epoch": epoch,
+            "loss": logs["loss"],
+            "acc": logs["acc"],
+            "val_loss": logs["val_loss"],
+            "val_acc": logs["val_acc"],
+        })),
+    )
+
     model = build_model([5, window, 1])
     model.fit(
         X_train,
@@ -79,7 +91,8 @@ def main(settings):
         batch_size=settings.batch_size,
         epochs=settings.epochs,
         validation_split=settings.validation_split,
-        verbose=2)
+        callbacks=[json_logging_callback],
+        verbose=0)
 
     # serialize model to JSON
     model_json = model.to_json()
