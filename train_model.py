@@ -41,17 +41,31 @@ def load_data(my_data, seq_len):
     return [x_train, y_train, x_test, y_test]
 
 
-def build_model(layers):
-    d = 0.2
+def build_single_lstm(layers):
+    model = Sequential()
+    model.add(LSTM(50, input_shape=(layers[1], layers[0]), return_sequences=False))
+    model.add(Dense(1, activation="relu", kernel_initializer="uniform"))
+    model.compile(loss="mse", optimizer="rmsprop", metrics=["accuracy"])
+    return model
+
+
+def build_double_lstm(layers):
+    dropout = 0.2
     model = Sequential()
     model.add(LSTM(128, input_shape=(layers[1], layers[0]), return_sequences=True))
-    model.add(Dropout(d))
+    model.add(Dropout(dropout))
     model.add(LSTM(64, input_shape=(layers[1], layers[0]), return_sequences=False))
-    model.add(Dropout(d))
+    model.add(Dropout(dropout))
     model.add(Dense(16, activation="relu", kernel_initializer="uniform"))
     model.add(Dense(1, activation="relu", kernel_initializer="uniform"))
     model.compile(loss="mse", optimizer="adam", metrics=["accuracy"])
     return model
+
+
+model_architectures = {
+    "single_lstm": build_single_lstm,
+    "double_lstm": build_double_lstm,
+}
 
 
 def main(settings):
@@ -84,7 +98,13 @@ def main(settings):
         })),
     )
 
-    model = build_model([5, window, 1])
+    # figure out which model architecture to use
+    arch = settings.model_architecture
+    assert arch in model_architectures, "Unknown model architecture '%s'." % arch
+    builder = model_architectures[arch]
+
+    # build and train the model
+    model = builder([5, window, 1])
     model.fit(
         X_train,
         y_train,
@@ -109,6 +129,7 @@ if __name__ == "__main__":
     parser.add_argument("--epochs", type=int, required=True)
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--validation_split", type=float, required=True)
+    parser.add_argument("--model_architecture", type=str, required=True, help="'single_lstm' or 'double_lstm'")
     parser.add_argument("--dataset_dir", type=str, default="/valohai/inputs/dataset")
     parser.add_argument("--output_dir", type=str, default="/valohai/outputs")
     settings, unparsed = parser.parse_known_args()
