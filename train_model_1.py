@@ -1,18 +1,8 @@
 import numpy as np
 import pandas as pd
-from pandas import datetime
-import math, time
-import itertools
-from sklearn import preprocessing
-import datetime
-from operator import itemgetter
-from sklearn.metrics import mean_squared_error
-from math import sqrt
-from keras.models import Sequential
-from keras.models import model_from_json
-from keras.layers.core import Dense, Dropout, Activation
+from keras.layers.core import Dense, Dropout
 from keras.layers.recurrent import LSTM
-from sklearn.metrics import mean_absolute_error
+from keras.models import Sequential
 
 def get_data(normalized=0):
     my_data = pd.read_csv('rte.csv', header=1, error_bad_lines=False)
