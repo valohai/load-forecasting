@@ -4,7 +4,7 @@ from keras.layers.core import Dense, Dropout
 from keras.layers.recurrent import LSTM
 from keras.models import Sequential
 
-def get_data(normalized=0):
+def get_data():
     my_data = pd.read_csv('rte.csv', header=1, error_bad_lines=False)
     df = pd.DataFrame(my_data)
     df.drop(df.columns[[0, 3, 7, 8]], axis=1, inplace=True)
@@ -33,7 +33,7 @@ def load_data(my_data, seq_len):
     return [x_train, y_train, x_test, y_test]
 
 
-df = get_data(0)
+df = get_data()
 # min_max_scaler = preprocessing.MinMaxScaler()
 # nomalized = min_max_scaler.fit_transform(df.values)
 values = df.values
