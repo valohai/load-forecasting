@@ -86,7 +86,6 @@ def main(settings):
         values[:, 3] = (values[:, 3] - np.amin(values[:, 3])) / (np.amax(values[:, 3]) - np.amin(values[:, 3]))
     else:
         values[:, 1] = (values[:, 1] - minima) / scaling_parameter
-        values[:, 0] = (values[:, 0] - np.amin(values[:, 0])) / (np.amax(values[:, 0]) - np.amin(values[:, 0]))
 
 
     df = pd.DataFrame(values)
