@@ -10,10 +10,10 @@ from keras.models import Sequential
 from keras.callbacks import LambdaCallback
 
 
-def get_data():
+def get_data(dataset_dir):
     # use the csv first file in the dataset directory
-    filename = glob.glob(os.path.join(settings.dataset_dir, "*.csv"))[0]
-    dataset_path = os.path.join(settings.dataset_dir, filename)
+    filename = glob.glob(os.path.join(dataset_dir, "*.csv"))[0]
+    dataset_path = os.path.join(dataset_dir, filename)
 
     my_data = pd.read_csv(dataset_path, header=1, error_bad_lines=False)
     df = pd.DataFrame(my_data)
@@ -69,7 +69,7 @@ model_architectures = {
 
 
 def main(settings):
-    df = get_data()
+    df = get_data(settings.dataset_dir)
     values = df.values
     minima = np.amin(values[:, -1])
     maxima = np.amax(values[:, -1])
@@ -124,7 +124,7 @@ def main(settings):
     print("Saved model to disk")
 
 
-if __name__ == "__main__":
+def cli():
     parser = argparse.ArgumentParser()
     parser.add_argument("--epochs", type=int, required=True)
     parser.add_argument("--batch_size", type=int, required=True)
@@ -132,5 +132,9 @@ if __name__ == "__main__":
     parser.add_argument("--model_architecture", type=str, required=True, help="'single_lstm' or 'double_lstm'")
     parser.add_argument("--dataset_dir", type=str, default="/valohai/inputs/dataset")
     parser.add_argument("--output_dir", type=str, default="/valohai/outputs")
-    settings, unparsed = parser.parse_known_args()
+    settings = parser.parse_args()
     main(settings)
+
+
+if __name__ == "__main__":
+    cli()
