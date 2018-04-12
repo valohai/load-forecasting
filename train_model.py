@@ -10,14 +10,14 @@ from keras.models import Sequential
 from keras.callbacks import LambdaCallback
 
 
-def get_data(dataset_dir):
+def get_data(dataset_dir, dataset_name):
     # use the csv first file in the dataset directory
     filename = glob.glob(os.path.join(dataset_dir, "*.csv"))[0]
     dataset_path = os.path.join(dataset_dir, filename)
 
     my_data = pd.read_csv(dataset_path, header=1, error_bad_lines=False)
     df = pd.DataFrame(my_data)
-    if(settings.dataset == 'rte'):
+    if(dataset_name == 'rte'):
         df.drop(df.columns[[0, 3, 7, 8]], axis=1, inplace=True)
     else:
         df.drop(df.columns[[1, 2, 3, 4, 5]], axis=1, inplace=True)
@@ -72,7 +72,7 @@ model_architectures = {
 
 
 def main(settings):
-    df = get_data(settings.dataset_dir)
+    df = get_data(settings.dataset_dir, settings.dataset)
     values = df.values
     minima = np.amin(values[:, -1])
     maxima = np.amax(values[:, -1])
