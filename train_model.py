@@ -17,7 +17,10 @@ def get_data(dataset_dir):
 
     my_data = pd.read_csv(dataset_path, header=1, error_bad_lines=False)
     df = pd.DataFrame(my_data)
-    df.drop(df.columns[[0, 3, 7, 8]], axis=1, inplace=True)
+    if(settings.dataset == 'rte'):
+        df.drop(df.columns[[0, 3, 7, 8]], axis=1, inplace=True)
+    else:
+        df.drop(df.columns[[1, 2, 3, 4, 5]], axis=1, inplace=True)
     return df
 
 
@@ -129,6 +132,7 @@ def cli():
     parser.add_argument("--epochs", type=int, required=True)
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--validation_split", type=float, required=True)
+    parser.add_argument("--dataset", type=str, required=True, help="'rte' or 'ercot'")
     parser.add_argument("--model_architecture", type=str, required=True, help="'single_lstm' or 'double_lstm'")
     parser.add_argument("--dataset_dir", type=str, default="/valohai/inputs/dataset")
     parser.add_argument("--output_dir", type=str, default="/valohai/outputs")
