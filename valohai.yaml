@@ -19,10 +19,6 @@
         description: Use single_lstm or double_lstm
         type: string
         default: single_lstm
-      - name: dataset
-        description: Use RTE or ERCOT dataset
-        type: string
-        default: rte
     inputs:
       - name: dataset
         default: https://s3-eu-west-1.amazonaws.com/valohai-examples/load-forecasting/rte-dataset.csv
