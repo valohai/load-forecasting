@@ -10,13 +10,16 @@ from keras.models import Sequential
 from keras.callbacks import LambdaCallback
 
 
-def get_data(dataset_dir):
+def get_data(dataset_dir, dataset_name):
     # use the csv first file in the dataset directory
     dataset_path = glob.glob(os.path.join(dataset_dir, "*.csv"))[0]
 
     my_data = pd.read_csv(dataset_path, header=1, error_bad_lines=False)
     df = pd.DataFrame(my_data)
-    df.drop(df.columns[[0, 3, 7, 8]], axis=1, inplace=True)
+    if(dataset_name == 'rte'):
+        df.drop(df.columns[[0, 3, 7, 8]], axis=1, inplace=True)
+    else:
+        df.drop(df.columns[[1, 2, 3, 4, 5]], axis=1, inplace=True)
     return df
 
 
@@ -68,16 +71,21 @@ model_architectures = {
 
 
 def main(settings):
-    df = get_data(settings.dataset_dir)
+    df = get_data(settings.dataset_dir, settings.dataset)
     values = df.values
     minima = np.amin(values[:, -1])
     maxima = np.amax(values[:, -1])
     scaling_parameter = maxima - minima
-    values[:, 4] = (values[:, 4] - minima) / scaling_parameter
-    values[:, 0] = (values[:, 0] - np.amin(values[:, 0])) / (np.amax(values[:, 0]) - np.amin(values[:, 0]))
-    values[:, 1] = (values[:, 1] - np.amin(values[:, 1])) / (np.amax(values[:, 1]) - np.amin(values[:, 1]))
-    values[:, 2] = (values[:, 2] - np.amin(values[:, 2])) / (np.amax(values[:, 2]) - np.amin(values[:, 2]))
-    values[:, 3] = (values[:, 3] - np.amin(values[:, 3])) / (np.amax(values[:, 3]) - np.amin(values[:, 3]))
+    
+    if(settings.dataset == 'rte'):
+        values[:, 4] = (values[:, 4] - minima) / scaling_parameter
+        values[:, 0] = (values[:, 0] - np.amin(values[:, 0])) / (np.amax(values[:, 0]) - np.amin(values[:, 0]))
+        values[:, 1] = (values[:, 1] - np.amin(values[:, 1])) / (np.amax(values[:, 1]) - np.amin(values[:, 1]))
+        values[:, 2] = (values[:, 2] - np.amin(values[:, 2])) / (np.amax(values[:, 2]) - np.amin(values[:, 2]))
+        values[:, 3] = (values[:, 3] - np.amin(values[:, 3])) / (np.amax(values[:, 3]) - np.amin(values[:, 3]))
+    else:
+        values[:, 1] = (values[:, 1] - minima) / scaling_parameter
+
 
     df = pd.DataFrame(values)
     window = 5
@@ -128,6 +136,7 @@ def cli():
     parser.add_argument("--epochs", type=int, required=True)
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--validation_split", type=float, required=True)
+    parser.add_argument("--dataset", type=str, required=True, help="'rte' or 'ercot'")
     parser.add_argument("--model_architecture", type=str, required=True, help="'single_lstm' or 'double_lstm'")
     parser.add_argument("--dataset_dir", type=str, default="/valohai/inputs/dataset")
     parser.add_argument("--output_dir", type=str, default="/valohai/outputs")
