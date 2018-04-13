@@ -12,8 +12,7 @@ from keras.callbacks import LambdaCallback
 
 def get_data(dataset_dir):
     # use the csv first file in the dataset directory
-    filename = glob.glob(os.path.join(dataset_dir, "*.csv"))[0]
-    dataset_path = os.path.join(dataset_dir, filename)
+    dataset_path = glob.glob(os.path.join(dataset_dir, "*.csv"))[0]
 
     my_data = pd.read_csv(dataset_path, header=1, error_bad_lines=False)
     df = pd.DataFrame(my_data)
