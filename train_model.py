@@ -126,7 +126,7 @@ def main(settings):
         shape_param = 5
     else:
         shape_param = 4
-    model = builder([5, window, 1])
+    model = builder([shape_param, window, 1])
     model.fit(
         X_train,
         y_train,
