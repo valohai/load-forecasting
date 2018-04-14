@@ -98,7 +98,11 @@ def main(settings):
         values[:, 3] = (values[:, 3] - minima) / scaling_parameter
 
     df = pd.DataFrame(values)
-    window = 5
+    window = -1
+    if dataset_format == 'rte':
+        window = 5
+    else:
+        window = 4
     X_train, y_train, X_test, y_test = load_data(df[::-1], window)
     print("X_train", X_train.shape)
     print("y_train", y_train.shape)
