@@ -92,8 +92,11 @@ def main(settings):
         values[:, 4] = (values[:, 4] - minima) / scaling_parameter
     elif dataset_format == 'ercot':
         # TODO: do something with the Date column (values[:, 0])
-        values[:, 1] = (values[:, 1] - minima) / scaling_parameter
         values[:, 0] = (values[:, 0] - np.amin(values[:, 0])) / (np.amax(values[:, 0]) - np.amin(values[:, 0]))
+        values[:, 1] = (values[:, 1] - np.amin(values[:, 1])) / (np.amax(values[:, 1]) - np.amin(values[:, 1]))
+        values[:, 2] = (values[:, 2] - np.amin(values[:, 2])) / (np.amax(values[:, 2]) - np.amin(values[:, 2]))
+        values[:, 3] = (values[:, 3] - np.amin(values[:, 3])) / (np.amax(values[:, 3]) - np.amin(values[:, 3]))
+        values[:, 4] = (values[:, 4] - minima) / scaling_parameter
 
     df = pd.DataFrame(values)
     window = 5
