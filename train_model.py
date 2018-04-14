@@ -24,7 +24,7 @@ def get_data(dataset_dir):
         return df, 'rte'
     elif 'SYSLoad' in column_names:
         # ERCOT dataset format.
-        df = df.filter(items=['Date', 'SYSLoad'])
+        df = df.filter(items=['Day', 'Month', 'Minutes' ,'SYSLoad'])
         return df, 'ercot'
     else:
         raise Exception('Unknown dataset format with columns: {}'.format(column_names))
@@ -93,6 +93,7 @@ def main(settings):
     elif dataset_format == 'ercot':
         # TODO: do something with the Date column (values[:, 0])
         values[:, 1] = (values[:, 1] - minima) / scaling_parameter
+        values[:, 0] = (values[:, 0] - np.amin(values[:, 0])) / (np.amax(values[:, 0]) - np.amin(values[:, 0]))
 
     df = pd.DataFrame(values)
     window = 5
