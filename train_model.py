@@ -98,11 +98,7 @@ def main(settings):
         values[:, 3] = (values[:, 3] - minima) / scaling_parameter
 
     df = pd.DataFrame(values)
-    window = -1
-    if dataset_format == 'rte':
-        window = 5
-    else:
-        window = 4
+    window = 5
     X_train, y_train, X_test, y_test = load_data(df[::-1], window)
     print("X_train", X_train.shape)
     print("y_train", y_train.shape)
@@ -125,6 +121,11 @@ def main(settings):
     builder = model_architectures[arch]
 
     # build and train the model
+    shape_param = -1
+    if(dataset_format == 'rte'):
+        shape_param = 5
+    else:
+        shape_param = 4
     model = builder([5, window, 1])
     model.fit(
         X_train,
