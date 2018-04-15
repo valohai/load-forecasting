@@ -1,3 +1,6 @@
+import os
+import glob
+import json
 import numpy as np
 import pandas as pd
 from pandas import datetime
@@ -14,7 +17,6 @@ from keras.layers.core import Dense, Dropout, Activation
 from keras.layers.recurrent import LSTM
 from sklearn.metrics import mean_absolute_error
 import argparse
-import glob
 
 def mean_absolute_percentage_error(y_true, y_pred):
     y_true, y_pred = np.array(y_true), np.array(y_pred)
