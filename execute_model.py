@@ -2,12 +2,11 @@ import os
 import glob
 import json
 import numpy as np
-import pandas as pd
 from math import sqrt
 from keras.models import model_from_json
 from sklearn.metrics import mean_absolute_error
 import argparse
-from utils import feature_extraction, load_data
+from utils import feature_extraction, split_features
 
 
 def mean_absolute_percentage_error(y_true, y_pred):
@@ -16,9 +15,9 @@ def mean_absolute_percentage_error(y_true, y_pred):
 
 
 def main(settings):
-    features, minima, maxima, scaling_parameter, dataset_format = feature_extraction(settings.dataset_dir)
+    features, minima, maxima, scaling_parameter = feature_extraction(settings.dataset_dir)
     window = 5
-    X_train, y_train, X_test, y_test = load_data(features[::-1], window)
+    X_train, y_train, X_test, y_test = split_features(features[::-1], window)
     print("X_train", X_train.shape)
     print("y_train", y_train.shape)
     print("X_test", X_test.shape)

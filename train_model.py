@@ -1,13 +1,11 @@
 import os
 import json
 import argparse
-import numpy as np
-import pandas as pd
 from keras.layers.core import Dense, Dropout
 from keras.layers.recurrent import LSTM
 from keras.models import Sequential
 from keras.callbacks import LambdaCallback
-from utils import feature_extraction, load_data
+from utils import feature_extraction, split_features
 
 
 def build_single_lstm(layers):
@@ -38,9 +36,9 @@ model_architectures = {
 
 
 def main(settings):
-    features, minima, maxima, scaling_parameter, dataset_format = feature_extraction(settings.dataset_dir)
+    features, minima, maxima, scaling_parameter = feature_extraction(settings.dataset_dir)
     window = 5
-    X_train, y_train, X_test, y_test = load_data(features[::-1], window)
+    X_train, y_train, X_test, y_test = split_features(features[::-1], window)
     print("X_train", X_train.shape)
     print("y_train", y_train.shape)
     print("X_test", X_test.shape)
@@ -62,12 +60,7 @@ def main(settings):
     builder = model_architectures[arch]
 
     # build and train the model
-    if dataset_format == 'rte':
-        shape_param = 5
-    else:
-        shape_param = 4
-
-    model = builder([shape_param, window, 1])
+    model = builder([len(features.columns), window, 1])
     model.fit(
         X_train,
         y_train,
