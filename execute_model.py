@@ -3,32 +3,24 @@ import glob
 import json
 import numpy as np
 import pandas as pd
-from pandas import datetime
-import math, time
-import itertools
-from sklearn import preprocessing
-import datetime
-from operator import itemgetter
-from sklearn.metrics import mean_squared_error
 from math import sqrt
-from keras.models import Sequential
 from keras.models import model_from_json
-from keras.layers.core import Dense, Dropout, Activation
-from keras.layers.recurrent import LSTM
 from sklearn.metrics import mean_absolute_error
 import argparse
+
 
 def mean_absolute_percentage_error(y_true, y_pred):
     y_true, y_pred = np.array(y_true), np.array(y_pred)
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
+
 def get_data(dataset_dir):
     # use the csv first file in the dataset directory
     dataset_path = glob.glob(os.path.join(dataset_dir, "*.csv"))[0]
-    
+
     my_data = pd.read_csv(dataset_path, error_bad_lines=False)
     df = pd.DataFrame(my_data)
-    
+
     column_names = list(df)
     if 'Demand' in column_names:
         # RTE dataset format
@@ -36,7 +28,7 @@ def get_data(dataset_dir):
         return df, 'rte'
     elif 'SYSLoad' in column_names:
         # ERCOT dataset format.
-        df = df.filter(items=['Day', 'Month', 'Minutes' ,'SYSLoad'])
+        df = df.filter(items=['Day', 'Month', 'Minutes', 'SYSLoad'])
         return df, 'ercot'
     else:
         raise Exception('Unknown dataset format with columns: {}'.format(column_names))
@@ -49,7 +41,7 @@ def load_data(my_data, seq_len):
     result = []
     for index in range(len(data) - sequence_length):
         result.append(data[index: index + sequence_length])
-    
+
     result = np.array(result)
     row = round(0.8 * result.shape[0])
     train = result[:int(row), :]
@@ -61,9 +53,10 @@ def load_data(my_data, seq_len):
     x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], amount_of_features))
     return [x_train, y_train, x_test, y_test]
 
+
 def main(settings):
     df, dataset_format = get_data(settings.dataset_dir)
-    
+
     values = df.values
     minima = np.amin(values[:, -1])
     maxima = np.amax(values[:, -1])
@@ -80,7 +73,7 @@ def main(settings):
         values[:, 1] = (values[:, 1] - np.amin(values[:, 1])) / (np.amax(values[:, 1]) - np.amin(values[:, 1]))
         values[:, 2] = (values[:, 2] - np.amin(values[:, 2])) / (np.amax(values[:, 2]) - np.amin(values[:, 2]))
         values[:, 3] = (values[:, 3] - minima) / scaling_parameter
-    
+
     df = pd.DataFrame(values)
     window = 5
     X_train, y_train, X_test, y_test = load_data(df[::-1], window)
@@ -100,17 +93,16 @@ def main(settings):
 
     predicted2 = model.predict(X_test)
     actual = y_test
-    predicted2 = (predicted2*scaling_parameter)+minima
-    actual = (actual*scaling_parameter)+minima
+    predicted2 = (predicted2 * scaling_parameter) + minima
+    actual = (actual * scaling_parameter) + minima
 
     mape2 = sqrt(mean_absolute_percentage_error(predicted2, actual))
-    mse2  = mean_absolute_error(actual, predicted2)
-        
-    print(json.dumps({
-          "mape":mape2,
-          "mse":mse2
-          }))
+    mse2 = mean_absolute_error(actual, predicted2)
 
+    print(json.dumps({
+        "mape": mape2,
+        "mse": mse2
+    }))
 
 
 def cli():
