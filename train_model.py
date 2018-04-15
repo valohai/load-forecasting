@@ -80,7 +80,6 @@ def main(settings):
     builder = model_architectures[arch]
 
     # build and train the model
-    shape_param = -1
     if dataset_format == 'rte':
         shape_param = 5
     else:
