@@ -90,12 +90,12 @@ def main(settings):
     print("y_test", y_test.shape)
 
     # load json and create model
-    json_file = open(glob.glob(os.path.join(settings.output_dir, "*.json"))[0], 'r')
+    json_file = open("/valohai/outputs/model-layout.json", 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     model = model_from_json(loaded_model_json)
     # load weights into new model
-    model.load_weights(glob.glob(os.path.join(settings.output_dir, "*.h5"))[0])
+    model.load_weights("/valohai/outputs/model-weights.h5")
     print("Loaded model from disk")
 
     predicted2 = model.predict(X_test)
