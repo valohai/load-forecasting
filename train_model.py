@@ -1,5 +1,4 @@
 import os
-import glob
 import json
 import argparse
 import numpy as np
@@ -8,46 +7,7 @@ from keras.layers.core import Dense, Dropout
 from keras.layers.recurrent import LSTM
 from keras.models import Sequential
 from keras.callbacks import LambdaCallback
-
-
-def get_data(dataset_dir):
-    # use the csv first file in the dataset directory
-    dataset_path = glob.glob(os.path.join(dataset_dir, "*.csv"))[0]
-
-    my_data = pd.read_csv(dataset_path, error_bad_lines=False)
-    df = pd.DataFrame(my_data)
-
-    column_names = list(df)
-    if 'Demand' in column_names:
-        # RTE dataset format
-        df = df.filter(items=['Day', 'Month', 'Hours', 'Temperature', 'Demand'])
-        return df, 'rte'
-    elif 'SYSLoad' in column_names:
-        # ERCOT dataset format.
-        df = df.filter(items=['Day', 'Month', 'Minutes' ,'SYSLoad'])
-        return df, 'ercot'
-    else:
-        raise Exception('Unknown dataset format with columns: {}'.format(column_names))
-
-
-def load_data(my_data, seq_len):
-    amount_of_features = len(my_data.columns)
-    data = my_data.as_matrix()
-    sequence_length = seq_len + 1
-    result = []
-    for index in range(len(data) - sequence_length):
-        result.append(data[index: index + sequence_length])
-
-    result = np.array(result)
-    row = round(0.8 * result.shape[0])
-    train = result[:int(row), :]
-    x_train = train[:, :-1]
-    y_train = train[:, -1][:, -1]
-    x_test = result[int(row):, :-1]
-    y_test = result[int(row):, -1][:, -1]
-    x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], amount_of_features))
-    x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], amount_of_features))
-    return [x_train, y_train, x_test, y_test]
+from utils import get_dataframe, load_data
 
 
 def build_single_lstm(layers):
@@ -78,7 +38,7 @@ model_architectures = {
 
 
 def main(settings):
-    df, dataset_format = get_data(settings.dataset_dir)
+    df, dataset_format = get_dataframe(settings.dataset_dir)
 
     values = df.values
     minima = np.amin(values[:, -1])
@@ -91,7 +51,6 @@ def main(settings):
         values[:, 3] = (values[:, 3] - np.amin(values[:, 3])) / (np.amax(values[:, 3]) - np.amin(values[:, 3]))
         values[:, 4] = (values[:, 4] - minima) / scaling_parameter
     elif dataset_format == 'ercot':
-        # TODO: do something with the Date column (values[:, 0])
         values[:, 0] = (values[:, 0] - np.amin(values[:, 0])) / (np.amax(values[:, 0]) - np.amin(values[:, 0]))
         values[:, 1] = (values[:, 1] - np.amin(values[:, 1])) / (np.amax(values[:, 1]) - np.amin(values[:, 1]))
         values[:, 2] = (values[:, 2] - np.amin(values[:, 2])) / (np.amax(values[:, 2]) - np.amin(values[:, 2]))
@@ -122,10 +81,11 @@ def main(settings):
 
     # build and train the model
     shape_param = -1
-    if(dataset_format == 'rte'):
+    if dataset_format == 'rte':
         shape_param = 5
     else:
         shape_param = 4
+
     model = builder([shape_param, window, 1])
     model.fit(
         X_train,
