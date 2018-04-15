@@ -24,14 +24,9 @@
         default: https://s3-eu-west-1.amazonaws.com/valohai-examples/load-forecasting/rte-dataset.csv
 
 - step:
-    name: execute-model-1
+    name: execute-model
     image: valohai/keras:2.1.3-tensorflow1.4.0-python3.5-cuda8.0-cudnn6-devel-ubuntu14.04
-    command: python execute_model_1.py
+    command: python execute_model.py
     inputs:
       - name: dataset
         default: https://s3-eu-west-1.amazonaws.com/valohai-examples/load-forecasting/rte-dataset.csv
-- step:
-    name: execute-model-2
-    image: valohai/keras:2.1.3-tensorflow1.4.0-python3.5-cuda8.0-cudnn6-devel-ubuntu14.04
-    command: python execute_model_2.py
-
