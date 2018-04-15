@@ -30,3 +30,4 @@
     inputs:
       - name: dataset
         default: https://s3-eu-west-1.amazonaws.com/valohai-examples/load-forecasting/rte-dataset.csv
+      - name: model

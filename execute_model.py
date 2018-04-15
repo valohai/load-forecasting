@@ -83,12 +83,15 @@ def main(settings):
     print("y_test", y_test.shape)
 
     # load json and create model
-    json_file = open("/valohai/outputs/model-layout.json", 'r')
+    layout_path = glob.glob(os.path.join(settings.model_dir, "*layout.json"))[0]
+    json_file = open(layout_path, 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     model = model_from_json(loaded_model_json)
+
     # load weights into new model
-    model.load_weights("/valohai/outputs/model-weights.h5")
+    weights_path = glob.glob(os.path.join(settings.model_dir, "*weights.h5"))[0]
+    model.load_weights(weights_path)
     print("Loaded model from disk")
 
     predicted2 = model.predict(X_test)
@@ -108,7 +111,7 @@ def main(settings):
 def cli():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset_dir", type=str, default="/valohai/inputs/dataset")
-    parser.add_argument("--output_dir", type=str, default="/valohai/outputs")
+    parser.add_argument("--model_dir", type=str, default="/valohai/inputs/model")
     settings = parser.parse_args()
     main(settings)
 
