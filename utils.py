@@ -47,3 +47,27 @@ def load_data(data_frame, seq_len):
     x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], amount_of_features))
     x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], amount_of_features))
     return [x_train, y_train, x_test, y_test]
+
+
+def feature_extraction(dataset_dir):
+    df, dataset_format = get_dataframe(dataset_dir)
+
+    values = df.values
+    minima = np.amin(values[:, -1])
+    maxima = np.amax(values[:, -1])
+    scaling_parameter = maxima - minima
+
+    if dataset_format == 'rte':
+        values[:, 0] = (values[:, 0] - np.amin(values[:, 0])) / (np.amax(values[:, 0]) - np.amin(values[:, 0]))
+        values[:, 1] = (values[:, 1] - np.amin(values[:, 1])) / (np.amax(values[:, 1]) - np.amin(values[:, 1]))
+        values[:, 2] = (values[:, 2] - np.amin(values[:, 2])) / (np.amax(values[:, 2]) - np.amin(values[:, 2]))
+        values[:, 3] = (values[:, 3] - np.amin(values[:, 3])) / (np.amax(values[:, 3]) - np.amin(values[:, 3]))
+        values[:, 4] = (values[:, 4] - minima) / scaling_parameter
+    elif dataset_format == 'ercot':
+        values[:, 0] = (values[:, 0] - np.amin(values[:, 0])) / (np.amax(values[:, 0]) - np.amin(values[:, 0]))
+        values[:, 1] = (values[:, 1] - np.amin(values[:, 1])) / (np.amax(values[:, 1]) - np.amin(values[:, 1]))
+        values[:, 2] = (values[:, 2] - np.amin(values[:, 2])) / (np.amax(values[:, 2]) - np.amin(values[:, 2]))
+        values[:, 3] = (values[:, 3] - minima) / scaling_parameter
+
+    df = pd.DataFrame(values)
+    return df, minima, maxima, scaling_parameter, dataset_format

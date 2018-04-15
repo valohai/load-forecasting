@@ -7,7 +7,7 @@ from keras.layers.core import Dense, Dropout
 from keras.layers.recurrent import LSTM
 from keras.models import Sequential
 from keras.callbacks import LambdaCallback
-from utils import get_dataframe, load_data
+from utils import feature_extraction, load_data
 
 
 def build_single_lstm(layers):
@@ -38,27 +38,9 @@ model_architectures = {
 
 
 def main(settings):
-    df, dataset_format = get_dataframe(settings.dataset_dir)
-
-    values = df.values
-    minima = np.amin(values[:, -1])
-    maxima = np.amax(values[:, -1])
-    scaling_parameter = maxima - minima
-    if dataset_format == 'rte':
-        values[:, 0] = (values[:, 0] - np.amin(values[:, 0])) / (np.amax(values[:, 0]) - np.amin(values[:, 0]))
-        values[:, 1] = (values[:, 1] - np.amin(values[:, 1])) / (np.amax(values[:, 1]) - np.amin(values[:, 1]))
-        values[:, 2] = (values[:, 2] - np.amin(values[:, 2])) / (np.amax(values[:, 2]) - np.amin(values[:, 2]))
-        values[:, 3] = (values[:, 3] - np.amin(values[:, 3])) / (np.amax(values[:, 3]) - np.amin(values[:, 3]))
-        values[:, 4] = (values[:, 4] - minima) / scaling_parameter
-    elif dataset_format == 'ercot':
-        values[:, 0] = (values[:, 0] - np.amin(values[:, 0])) / (np.amax(values[:, 0]) - np.amin(values[:, 0]))
-        values[:, 1] = (values[:, 1] - np.amin(values[:, 1])) / (np.amax(values[:, 1]) - np.amin(values[:, 1]))
-        values[:, 2] = (values[:, 2] - np.amin(values[:, 2])) / (np.amax(values[:, 2]) - np.amin(values[:, 2]))
-        values[:, 3] = (values[:, 3] - minima) / scaling_parameter
-
-    df = pd.DataFrame(values)
+    features, minima, maxima, scaling_parameter, dataset_format = feature_extraction(settings.dataset_dir)
     window = 5
-    X_train, y_train, X_test, y_test = load_data(df[::-1], window)
+    X_train, y_train, X_test, y_test = load_data(features[::-1], window)
     print("X_train", X_train.shape)
     print("y_train", y_train.shape)
     print("X_test", X_test.shape)
